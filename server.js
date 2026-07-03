@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 // Proxy all API requests
 app.use("/api", async (req, res) => {
   try {
-    const url = req.originalUrl.replace("/api", "");
+    const url = req.originalUrl;
 
     const response = await api({
       url,

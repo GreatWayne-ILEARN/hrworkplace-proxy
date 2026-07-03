@@ -35,27 +35,29 @@ app.get("/", (req, res) => {
 // Proxy all API requests
 app.use("/api", async (req, res) => {
   try {
-    const url = req.originalUrl;
+    console.log("Incoming:", req.method, req.originalUrl);
+    console.log("Backend:", process.env.BACKEND_URL);
 
     const response = await api({
-      url,
+      url: req.originalUrl,
       method: req.method,
-      headers: {
-        Authorization: req.headers.authorization,
-        "Content-Type": req.headers["content-type"],
-      },
+      headers: req.headers,
       params: req.query,
       data: req.body,
       validateStatus: () => true,
     });
 
+    console.log("Status:", response.status);
+
     res.status(response.status).json(response.data);
   } catch (err) {
+    console.error(err.response?.status);
+    console.error(err.response?.data);
     console.error(err.message);
 
     res.status(500).json({
-      success: false,
-      message: "Unable to connect to backend.",
+      error: err.message,
+      backend: err.response?.data,
     });
   }
 });
